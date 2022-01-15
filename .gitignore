@@ -3,3 +3,9 @@ build
 
 .vscode
 log
+
+# Running zephyr.exe
+flash.bin
+
+# Twister
+twister-out*
