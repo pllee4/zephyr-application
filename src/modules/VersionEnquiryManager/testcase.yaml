@@ -1,0 +1,7 @@
+tests:
+  # section.subsection
+  modules.VersionEnquiryManager:
+    # build_only: true
+    platform_allow: native_posix
+    tags: version_enquiry_manager
+    extra_args: BUILD_TESTS=ON
