@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.13.1)
 
 ## Project options
+option(BUILD_TESTING "Build tests" OFF)
 option(BUILD_POSIX_NATIVE "Build as POSIX native target" ON)
 
 ## Global setup
