@@ -4,4 +4,4 @@ clean_build:
 	mkdir -p build
 
 app1:
-	west build . -DAPP_NAME=app1
+	west build -d build/app1 -- -DAPP_NAME=app1
