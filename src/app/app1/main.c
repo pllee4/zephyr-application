@@ -15,7 +15,10 @@ void main(void) {
   printk("App version minor: %d\n", APP_VERSION_MINOR);
   printk("App version patch: %d\n", APP_VERSION_PATCH);
   printk("App version: %s\n", APP_VERSION_STR);
-  while (1) {
+  printk("Enquiry manager version min: %d\n", ENQUIRY_MGR_VER_MIN);
+  printk("Enquiry manager min: %d\n", ENQUIRY_MGR_VER_MAX);
+  while (1)
+  {
     printk("Running app1 \n");
     k_sleep(K_MSEC(1000));
   }
