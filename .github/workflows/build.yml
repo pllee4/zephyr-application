@@ -1,0 +1,39 @@
+name: Build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: pllee4/ubuntu-ci:zephyr-2.7
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Build app1
+        run: make app1
+
+      - name: Archive firmware
+        uses: actions/upload-artifact@v2
+        with:
+          name: app1
+          path: zephyr-application/build/app1/zephyr/zephyr.*
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    container: pllee4/ubuntu-ci:zephyr-2.7
+    steps:
+      - name: Test
+        run: | 
+          bash ./run_test.sh
+          if [ -n "$(cat twister-out*/twister.log | grep ERROR)" ]; then exit 1; fi
+          cat twister-out*/*/*/handler.log
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with: 
+          name: twister_report
+          path: twister-out*/twister_report.xml
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
