@@ -9,8 +9,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          path: zephyr-application
 
       - name: Build app1
+        working-directory: zephyr-application
         run: make app1
 
       - name: Archive firmware
