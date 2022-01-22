@@ -44,7 +44,30 @@ jobs:
         uses: actions/upload-artifact@v2
         with: 
           name: twister_report
-          path: zephyr-application/twister-out*/twister_report.xml
+          path: zephyr-application/twister-out*/twister.xml
 
       - name: Download artifacts
         uses: actions/download-artifact@v2
+        with:
+          name: twister_report
+
+      - name: Merge Test Results
+        run: |
+          pip3 install junitparser junit2html
+          junitparser merge zephyr-application/twister-out*/twister.xml junit.xml
+          junit2html junit.xml junit.html
+      - name: Upload Unit Test Results in HTML
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: HTML Unit Test Results
+          if-no-files-found: ignore
+          path: |
+            junit.html
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        with:
+          check_name: Unit Test Results
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          files: "**/twister.xml"
+          comment_mode: off
