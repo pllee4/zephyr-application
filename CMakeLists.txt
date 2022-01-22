@@ -30,7 +30,7 @@ endif()
 ## Find project dependencies
 # Setup Zephyr RTOS
 list(APPEND BOARD_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
-find_package(Zephyr 2.7.0)
+find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 
 ## Project setup (must be called after zephyr setup)
 project(zephyr-application VERSION 0.1.0)
