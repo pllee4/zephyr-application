@@ -1,0 +1,73 @@
+name: Build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: pllee4/ubuntu-ci:zephyr-2.7-bionic
+    env:
+      CMAKE_PREFIX_PATH: /opt/toolchains
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          path: zephyr-application
+
+      - name: Build app1
+        working-directory: zephyr-application
+        run: make app1
+
+      - name: Archive firmware
+        uses: actions/upload-artifact@v2
+        with:
+          name: app1
+          path: zephyr-application/build/app1/zephyr/zephyr.*
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    container: pllee4/ubuntu-ci:zephyr-2.7-bionic
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          path: zephyr-application
+
+      - name: Test
+        working-directory: zephyr-application
+        run: | 
+          bash ./run_test.sh
+          if [ -n "$(cat twister-out*/twister.log | grep ERROR)" ]; then exit 1; fi
+          cat twister-out*/*/*/handler.log
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with: 
+          name: twister_report
+          path: zephyr-application/twister-out*/twister.xml
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: twister_report
+
+      - name: Merge Test Results
+        run: |
+          pip3 install junitparser junit2html
+          junitparser merge zephyr-application/twister-out*/twister.xml junit.xml
+          junit2html junit.xml junit.html
+      - name: Upload Unit Test Results in HTML
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: HTML Unit Test Results
+          if-no-files-found: ignore
+          path: |
+            junit.html
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        with:
+          check_name: Unit Test Results
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          files: "**/twister.xml"
+          comment_mode: off
